@@ -4,7 +4,7 @@ export default class MainPage {
         this._context = context;
         this._rootEl = context.rootEl();
         this._firstId = 0;
-        this._last = 0;
+        this._lastId = 0;
         this._postsCount = 5;
     }
 
@@ -130,8 +130,8 @@ export default class MainPage {
                     this._mediaNameInputEl.value = '';
                     this._mediaInputEl.value = '';
                     this._postsContainerEl.innerHTML = ``;
-                    this._last++;
-                    this.loadMorePosts(0, this._last);
+                    this._lastId++;
+                    this.loadMorePosts(0, this._lastId);
                     this._newPostsEl.innerHTML = '';
                     this.getFirstPost();
                 },
@@ -139,8 +139,8 @@ export default class MainPage {
                     this.showError(error);
                 });
         });
-        this.loadMorePosts(this._last, this._postsCount);
-        this._last += this._postsCount;
+        this.loadMorePosts(this._lastId, this._postsCount);
+        this._lastId += this._postsCount;
         this.getFirstPost();
 
         this.pollNewPosts();
@@ -160,7 +160,7 @@ export default class MainPage {
 
 
     loadMorePosts(lastPost, i) {
-        const str = "?last=" + lastPost + "&i=" + i;
+          const str = "?lastPost=" + lastPost + "&i=" + i;
         this._context.get("/posts" + str, {},
             text => {
                 const posts = JSON.parse(text);
@@ -231,7 +231,7 @@ export default class MainPage {
                 this._context.post(`/posts/${post.id}/likes`, null, {},
                     () => {
                         this._postsContainerEl.innerHTML = ``;
-                        this.loadMorePosts(0, this._last);
+                        this.loadMorePosts(0, this._lastId);
                     }, error => {
                         this.showError(error);
                     });
@@ -241,7 +241,7 @@ export default class MainPage {
                 this._context.delete(`/posts/${post.id}/likes`, {},
                     () => {
                         this._postsContainerEl.innerHTML = ``;
-                        this.loadMorePosts(0, this._last);
+                        this.loadMorePosts(0, this._lastId);
                     }, error => {
                         this.showError(error);
                     });
@@ -258,8 +258,8 @@ export default class MainPage {
                 this._context.delete(`/posts/${post.id}`, {},
                     () => {
                         this._postsContainerEl.innerHTML = ``;
-                        this._last--;
-                        this.loadMorePosts(0, this._last);
+                        this._lastId--;
+                        this.loadMorePosts(0, this._lastId);
                     }, error => {
                         this.showError(error);
                     });
@@ -277,8 +277,8 @@ export default class MainPage {
             loadPostEl.querySelector('[data-action=load-more]').addEventListener('click', evt => {
                 evt.preventDefault();
                 this._postsContainerEl.removeChild(loadPostEl);
-                this.loadMorePosts(this._last, this._postsCount);
-                this._last += this._postsCount;
+                this.loadMorePosts(this._lastId, this._postsCount);
+                this._lastId += this._postsCount;
             });
             this._postsContainerEl.appendChild(loadPostEl);
 
@@ -292,7 +292,7 @@ export default class MainPage {
     }
 
     newPostsSearch() {
-        const str = "?first=" + this._firstId;
+        const str = "?firstPostId=" + this._firstId;
         this._context.get("/posts" + str, {},
             text => {
                 const badge = JSON.parse(text);
@@ -321,8 +321,8 @@ export default class MainPage {
             evt.preventDefault();
             this._newPostsEl.removeChild(newPostEl);
             this._postsContainerEl.innerHTML = ``;
-            this._last += badge;
-            this.loadMorePosts(0, this._last);
+            this._lastId += badge;
+            this.loadMorePosts(0, this._lastId);
             this.getFirstPost();
         });
         this._newPostsEl.appendChild(newPostEl);
